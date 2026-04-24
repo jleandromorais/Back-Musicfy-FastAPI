@@ -33,7 +33,7 @@ class ProductUpdate(BaseModel):
 
 #Schema para resposta
 
-class productResponse(ProductBase):
+class ProductResponse(ProductBase):
     id: int
     created_at: datetime
     
@@ -43,7 +43,7 @@ class productResponse(ProductBase):
 #Schema para listagem com paginacao
 
 class ProductListResponse(BaseModel):
-    items: list[productResponse]
+    items: list[ProductResponse]
     total: int
     page: int
     page_size: int

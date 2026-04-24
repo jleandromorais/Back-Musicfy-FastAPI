@@ -37,7 +37,7 @@ __all__ = [
     "UserBase", "UserCreate", "UserUpdate", "UserResponse",
     "UserLogin", "Token", "TokenData",
     # Product
-    "ProductBase", "ProductCreate", "ProductUpdate", 
+    "ProductBase", "ProductCreate", "ProductUpdate",
     "ProductResponse", "ProductListResponse",
     # Cart
     "CartItemBase", "CartItemCreate", "CartItemResponse",
