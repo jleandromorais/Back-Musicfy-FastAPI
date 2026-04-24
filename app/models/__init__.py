@@ -5,6 +5,7 @@ from app.models.user import User
 from app.models.product import Product, CategoryEnum
 from app.models.cart import Cart, CartItem
 from app.models.order import Order, OrderItem, OrderStatus
+from app.models.address import Address
 
 __all__ = [
     "Base",
@@ -15,5 +16,6 @@ __all__ = [
     "CartItem",
     "Order",
     "OrderItem",
-    "OrderStatus"
+    "OrderStatus",
+    "Address",
 ]

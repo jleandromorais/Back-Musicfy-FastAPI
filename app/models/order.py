@@ -21,6 +21,7 @@ class Order(Base):
     total = Column(Float, nullable=False)
     status = Column(SQLEnum(OrderStatus), default=OrderStatus.PENDING)
     shipping_address = Column(String)
+    stripe_session_id = Column(String, unique=True, nullable=True, index=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
     # Relacionamentos

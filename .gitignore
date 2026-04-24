@@ -24,10 +24,28 @@ ENV/
 *.db
 *.sqlite3
 
-# Alembic
-alembic/versions/*.py
-!alembic/versions/__init__.py
+# Alembic (NÃO ignorar migrations — precisam ser commitadas para deploy)
+# alembic/versions/*.py
 
 # OS
 .DS_Store
 Thumbs.db
+
+# Secrets / credenciais
+firebase-service-account.json
+*.json.key
+*.pem
+
+# Testes temporários
+test_*.py
+
+# Build / distribuição
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs
+*.log
