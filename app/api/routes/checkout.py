@@ -11,6 +11,7 @@ from app.models.order import Order, OrderItem, OrderStatus
 from app.models.address import Address
 from app.models.cart import Cart, CartItem
 from app.models.product import Product
+from sqlalchemy.orm import selectinload
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -133,6 +134,7 @@ async def stripe_webhook(request: Request, db: AsyncSession = Depends(get_db)):
     if event["type"] == "checkout.session.completed":
         session = event["data"]["object"]
         session_id = session["id"]
+        cart_id = session.get("metadata", {}).get("cartId")
 
         result = await db.execute(
             select(Order).where(Order.stripe_session_id == session_id)
@@ -140,6 +142,20 @@ async def stripe_webhook(request: Request, db: AsyncSession = Depends(get_db)):
         order = result.scalar_one_or_none()
         if order:
             order.status = OrderStatus.PAID
-            await db.commit()
+
+        # Limpar o carrinho no banco após pagamento confirmado
+        if cart_id:
+            cart_result = await db.execute(
+                select(Cart)
+                .where(Cart.id == int(cart_id))
+                .options(selectinload(Cart.items))
+            )
+            cart = cart_result.scalar_one_or_none()
+            if cart:
+                for item in cart.items:
+                    await db.delete(item)
+                await db.delete(cart)
+
+        await db.commit()
 
     return {"received": True}
