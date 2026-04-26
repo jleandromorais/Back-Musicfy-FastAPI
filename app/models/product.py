@@ -1,6 +1,6 @@
 # app/models/product.py
 
-from sqlalchemy import Column, Integer, String, Float, DateTime, Enum as SQLEnum
+from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime, Enum as SQLEnum
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 import enum
@@ -22,6 +22,7 @@ class Product(Base):
     imagem_url = Column(String)
     categoria = Column(SQLEnum(CategoryEnum), nullable=False)
     estoque = Column(Integer, default=0)
+    is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
     # Relacionamentos
