@@ -15,7 +15,7 @@ async def list_products(
     categoria: Optional[str] = Query(None),
     db: AsyncSession = Depends(get_db),
 ):
-    query = select(Product).where(Product.estoque > 0)
+    query = select(Product).where(Product.estoque > 0, Product.is_active == True)
     if categoria:
         try:
             cat = CategoryEnum(categoria)
