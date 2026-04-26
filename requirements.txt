@@ -24,5 +24,8 @@ email-validator==2.2.0
 # Payments
 stripe==11.2.0
 
+# Firebase
+firebase-admin==6.5.0
+
 # Utils
 python-dateutil==2.9.0
