@@ -1,10 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Header
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from pydantic import BaseModel
+from typing import Optional
 
 from app.core.database import get_db
+from app.core.firebase import verify_firebase_token
 from app.models.order import Order, OrderItem, OrderStatus
 from app.models.user import User
 
@@ -65,8 +67,17 @@ async def _get_order_with_items(order_id: int, db: AsyncSession) -> Order:
 
 
 @router.get("/user/{firebase_uid}")
-async def get_orders_by_user(firebase_uid: str, db: AsyncSession = Depends(get_db)):
-    # Busca o usuário pelo firebase_uid
+async def get_orders_by_user(
+    firebase_uid: str,
+    authorization: Optional[str] = Header(None),
+    db: AsyncSession = Depends(get_db),
+):
+    # Verifica se o token pertence ao mesmo uid da URL (evita IDOR)
+    token = authorization[7:] if authorization and authorization.startswith("Bearer ") else None
+    token_uid = verify_firebase_token(token) if token else None
+    if not token_uid or token_uid != firebase_uid:
+        raise HTTPException(status_code=403, detail="Acesso negado")
+
     user_result = await db.execute(
         select(User).where(User.firebase_uid == firebase_uid)
     )
