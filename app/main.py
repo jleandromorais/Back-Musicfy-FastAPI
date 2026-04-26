@@ -8,6 +8,8 @@ from app.core.config import settings
 from app.api.routes import auth, products, usuario, enderecos, checkout, carrinho, orders
 from app.api.routes.admin import auth as admin_auth
 from app.api.routes.admin import products as admin_products
+from app.api.routes.admin import orders as admin_orders
+from app.api.routes.admin import users as admin_users
 
 # Criar app
 app = FastAPI(
@@ -37,6 +39,8 @@ app.include_router(orders.router, prefix="/api")
 # Rotas admin
 app.include_router(admin_auth.router, prefix="/api")
 app.include_router(admin_products.router, prefix="/api")
+app.include_router(admin_orders.router, prefix="/api")
+app.include_router(admin_users.router, prefix="/api")
 
 # Servir imagens de upload
 os.makedirs("uploads/products", exist_ok=True)
