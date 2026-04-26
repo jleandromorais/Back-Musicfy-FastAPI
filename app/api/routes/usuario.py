@@ -17,6 +17,10 @@ class FirebaseUserCreate(BaseModel):
     email: str
 
 
+class UserUpdate(BaseModel):
+    fullName: str
+
+
 def _user_to_dict(user: User) -> dict:
     return {
         "id": user.id,
@@ -78,6 +82,34 @@ async def criar_usuario(
         password_hash=None,
     )
     db.add(user)
+    await db.commit()
+    await db.refresh(user)
+    return _user_to_dict(user)
+
+
+@router.patch("/{user_id}")
+async def update_usuario(
+    user_id: int,
+    data: UserUpdate,
+    authorization: Optional[str] = Header(None),
+    db: AsyncSession = Depends(get_db),
+):
+    # Valida o token Firebase
+    token = authorization[7:] if authorization and authorization.startswith("Bearer ") else None
+    token_uid = _extract_uid(f"Bearer {token}") if token else None
+    if not token_uid:
+        raise HTTPException(status_code=401, detail="Token inválido ou ausente")
+
+    result = await db.execute(select(User).where(User.id == user_id))
+    user = result.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
+
+    # Garante que o usuário só pode editar o próprio perfil
+    if user.firebase_uid != token_uid:
+        raise HTTPException(status_code=403, detail="Acesso negado")
+
+    user.nome = data.fullName.strip()
     await db.commit()
     await db.refresh(user)
     return _user_to_dict(user)

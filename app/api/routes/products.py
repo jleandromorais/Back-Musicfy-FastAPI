@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, or_
 from typing import Optional
 
 from app.core.database import get_db
@@ -15,7 +15,10 @@ async def list_products(
     categoria: Optional[str] = Query(None),
     db: AsyncSession = Depends(get_db),
 ):
-    query = select(Product).where(Product.estoque > 0, Product.is_active == True)
+    query = select(Product).where(
+        Product.estoque > 0,
+        or_(Product.is_active == True, Product.is_active == None)
+    )
     if categoria:
         try:
             cat = CategoryEnum(categoria)

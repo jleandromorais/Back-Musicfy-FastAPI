@@ -15,8 +15,14 @@ def _init():
     path = os.getenv("FIREBASE_SERVICE_ACCOUNT_PATH", "")
     project_id = os.getenv("FIREBASE_PROJECT_ID", "")
 
+    json_str = os.getenv("FIREBASE_SERVICE_ACCOUNT_JSON", "")
+
     try:
-        if path and os.path.exists(path):
+        if json_str:
+            # Produção: JSON completo como variável de ambiente
+            cert = json.loads(json_str)
+            firebase_admin.initialize_app(credentials.Certificate(cert))
+        elif path and os.path.exists(path):
             firebase_admin.initialize_app(credentials.Certificate(path))
         elif project_id:
             firebase_admin.initialize_app(options={"projectId": project_id})
