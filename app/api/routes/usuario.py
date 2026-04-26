@@ -17,6 +17,10 @@ class FirebaseUserCreate(BaseModel):
     email: str
 
 
+class UserUpdate(BaseModel):
+    fullName: str
+
+
 def _user_to_dict(user: User) -> dict:
     return {
         "id": user.id,
@@ -78,6 +82,23 @@ async def criar_usuario(
         password_hash=None,
     )
     db.add(user)
+    await db.commit()
+    await db.refresh(user)
+    return _user_to_dict(user)
+
+
+@router.patch("/{user_id}")
+async def update_usuario(
+    user_id: int,
+    data: UserUpdate,
+    db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(select(User).where(User.id == user_id))
+    user = result.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
+
+    user.nome = data.fullName.strip()
     await db.commit()
     await db.refresh(user)
     return _user_to_dict(user)
